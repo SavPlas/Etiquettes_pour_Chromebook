@@ -131,7 +131,7 @@ def create_position_grid(selected_pos):
 
 # --- Application Streamlit ---
 st.set_page_config(page_title="Générateur d'Étiquettes LPETH pour les boîtes de Chromebook", layout="centered")
-st.title("Générateur d'Étiquettes LPETH")
+st.title("Générateur d'Étiquettes LPETH pour les boîtes de Chromebook")
 
 st.markdown("""
 Bienvenue dans le générateur d'étiquettes pour les élèves du LPETH !
