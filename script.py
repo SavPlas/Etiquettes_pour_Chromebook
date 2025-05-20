@@ -130,7 +130,7 @@ def create_position_grid(selected_pos):
     return grid_img
 
 # --- Application Streamlit ---
-st.set_page_config(page_title="Générateur d'Étiquettes LPETH", layout="centered")
+st.set_page_config(page_title="Générateur d'Étiquettes LPETH pour les boîtes de Chromebook", layout="centered")
 st.title("Générateur d'Étiquettes LPETH")
 
 st.markdown("""
