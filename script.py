@@ -24,7 +24,7 @@ QR_CODE_SIZE_PX = int((15 / 25.4) * 300)  # 15mm à 300 DPI
 font_name = None
 font_class_option = None
 font_email = None
-font_path = "assets/Roboto-VariableFont_wdth,wght.ttf"  # Chemin relatif vers la police
+font_path = "Roboto-VariableFont_wdth,wght.ttf"  # Chemin relatif vers la police
 
 if os.path.exists(font_path):
     try:
@@ -38,7 +38,7 @@ if os.path.exists(font_path):
         font_email = ImageFont.load_default()
 else:
     st.warning(
-        "Police personnalisée 'Roboto-VariableFont_wdth,wght.ttf' non trouvée. Utilisation de la police par défaut. Pour de meilleurs résultats, placez le fichier de police dans le dossier 'assets'.")
+        "Police personnalisée 'Roboto-VariableFont_wdth,wght.ttf' non trouvée. Utilisation de la police par défaut. Pour de meilleurs résultats, placez le fichier de police dans le même répertoire que le script.")
     font_name = ImageFont.load_default()
     font_class_option = ImageFont.load_default()
     font_email = ImageFont.load_default()
