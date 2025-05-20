@@ -1,6 +1,6 @@
 import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
-import qrcode
+import qrcode  # Import the qrcode library
 import io
 
 # --- Configuration ---
@@ -121,20 +121,20 @@ st.set_page_config(page_title="Générateur d'Étiquettes LPETH", layout="center
 st.title("🏷️ Générateur d'Étiquettes LPETH")
 
 st.markdown("""
-Bienvenue dans le générateur d'étiquettes pour les élèves du LPETH !
+Bienvenue dans le générateur d'étiquettes pour les élèves du LPETH !
 Remplissez les informations de l'élève ci-dessous et choisissez la position de l'étiquette sur la feuille A4.
 """)
 
 with st.form("label_form"):
     st.subheader("Informations de l'élève")
-    student_name = st.text_input("Nom de l'élève", help="Ex: DUPONT").upper()
-    student_firstname = st.text_input("Prénom de l'élève", help="Ex: Jean").capitalize()
-    student_class = st.text_input("Classe", help="Ex: 6TTI").upper()
-    student_option = st.text_input("Option", help="Ex: Informatique")
+    student_name = st.text_input("Nom de l'élève", help="Ex : DUPONT").upper()
+    student_firstname = st.text_input("Prénom de l'élève", help="Ex : Jean").capitalize()
+    student_class = st.text_input("Classe", help="Ex : 6TTI").upper()
+    student_option = st.text_input("Option", help="Ex : Informatique")
     student_email_prefix = st.text_input("Préfixe Email (avant @eduhainaut.be)", help="Ex: jean.dupont")
 
     full_email = f"{student_email_prefix}@eduhainaut.be" if student_email_prefix else ""
-    st.info(f"L'adresse email générée sera: **{full_email}**")
+    st.info(f"L'adresse email générée sera : **{full_email}**")
 
     st.subheader("Position de l'étiquette sur la feuille A4")
     label_positions = list(range(1, 25))
@@ -146,7 +146,7 @@ if submitted:
     if not (student_name and student_firstname and student_class and student_email_prefix):
         st.error("Veuillez remplir toutes les informations requises (Nom, Prénom, Classe, Préfixe Email).")
     else:
-        st.success("Étiquette générée avec succès ! 👇")
+        st.success("Étiquette générée avec succès ! 👇")
 
         # Créer l'image de l'étiquette unique
         single_label_img = create_single_label_image(
