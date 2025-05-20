@@ -8,13 +8,20 @@ import os
 A4_WIDTH_PX = 2480
 A4_HEIGHT_PX = 3508
 
-LABEL_WIDTH_PX = int((70 / 25.4) * 300)
-LABEL_HEIGHT_PX = int((36 / 25.4) * 300)
+LABEL_WIDTH_PX = int((70 / 25.4) * 300)  # 70 mm en pixels
+LABEL_HEIGHT_PX = int((36 / 25.4) * 300)  # 36 mm en pixels (modifié)
 
 LABEL_PADDING_X = 20
 LABEL_PADDING_Y = 10
 
 QR_CODE_SIZE_PX = int((15 / 25.4) * 300)
+
+# Marges et espacement entre étiquettes
+MARGIN_LEFT = int((5 / 25.4) * 300)   # 5 mm marge à gauche
+MARGIN_TOP = int((5 / 25.4) * 300)    # 5 mm marge en haut
+
+SPACING_X = 10  # espace horizontal entre étiquettes (en px)
+SPACING_Y = 5   # espace vertical entre étiquettes (en px)
 
 font_path = "Roboto-VariableFont_wdth,wght.ttf"
 if os.path.exists(font_path):
@@ -88,8 +95,8 @@ def create_a4_sheet(labels_data):
         col = (position - 1) % 3
         row = (position - 1) // 3
 
-        x_offset = col * LABEL_WIDTH_PX
-        y_offset = row * LABEL_HEIGHT_PX
+        x_offset = MARGIN_LEFT + col * (LABEL_WIDTH_PX + SPACING_X)
+        y_offset = MARGIN_TOP + row * (LABEL_HEIGHT_PX + SPACING_Y)
 
         a4_sheet.paste(label_img, (x_offset, y_offset))
 
@@ -102,8 +109,8 @@ def create_position_grid(selected_pos):
     for pos in range(1, 25):
         col = (pos - 1) % 3
         row = (pos - 1) // 3
-        x = col * LABEL_WIDTH_PX
-        y = row * LABEL_HEIGHT_PX
+        x = MARGIN_LEFT + col * (LABEL_WIDTH_PX + SPACING_X)
+        y = MARGIN_TOP + row * (LABEL_HEIGHT_PX + SPACING_Y)
         box_color = (255, 255, 255)
         outline_color = (0, 0, 0)
 
