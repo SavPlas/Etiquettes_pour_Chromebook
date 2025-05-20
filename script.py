@@ -1,4 +1,4 @@
-import streamlit as st
+    import streamlit as st
 from PIL import Image, ImageDraw, ImageFont
 import qrcode  # Import the qrcode library
 import io
@@ -20,6 +20,9 @@ LABEL_PADDING_Y = 10  # Réduit le rembourrage pour mieux adapter le contenu
 QR_CODE_SIZE_PX = int((15 / 25.4) * 300)  # 15mm à 300 DPI
 
 # Chemins des polices
+font_name = None
+font_class_option = None
+font_email = None
 try:
     font_name = ImageFont.truetype("arial.ttf", 50)  # Augmente la taille de la police
     font_class_option = ImageFont.truetype("arial.ttf", 40)  # Augmente la taille de la police
