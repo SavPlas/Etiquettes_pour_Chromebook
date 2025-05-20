@@ -23,12 +23,12 @@ if os.path.exists(font_path):
         font_class_option = ImageFont.truetype(font_path, 40)
         font_email = ImageFont.truetype(font_path, 40)
     except Exception as e:
-        st.warning(f"Erreur chargement police : {e}. Police par d\u00e9faut utilis\u00e9e.")
+        st.warning(f"Erreur chargement police : {e}. Police par défaut utilisée.")
         font_name = ImageFont.load_default()
         font_class_option = ImageFont.load_default()
         font_email = ImageFont.load_default()
 else:
-    st.warning("Police personnalis\u00e9e non trouv\u00e9e, police par d\u00e9faut utilis\u00e9e.")
+    st.warning("Police personnalisée non trouvée, police par défaut utilisée.")
     font_name = ImageFont.load_default()
     font_class_option = ImageFont.load_default()
     font_email = ImageFont.load_default()
@@ -123,30 +123,30 @@ def create_position_grid(selected_pos):
     return grid_img
 
 # --- Application Streamlit ---
-st.set_page_config(page_title="G\u00e9n\u00e9rateur d'\u00c9tiquettes LPETH", layout="centered")
-st.title("\ud83c\udff7\ufe0f G\u00e9n\u00e9rateur d'\u00c9tiquettes LPETH")
+st.set_page_config(page_title="Générateur d'Étiquettes LPETH", layout="centered")
+st.title("Générateur d'Étiquettes LPETH")
 
 st.markdown("""
-Bienvenue dans le g\u00e9n\u00e9rateur d'\u00e9tiquettes pour les \u00e9l\u00e8ves du LPETH !
-Remplissez les informations ci-dessous et cliquez sur la position de l'\u00e9tiquette \u00e0 imprimer.
+Bienvenue dans le générateur d'étiquettes pour les élèves du LPETH !
+Remplissez les informations ci-dessous et cliquez sur la position de l'étiquette à imprimer.
 """)
 
 with st.form("label_form"):
-    st.subheader("Informations de l'\u00e9l\u00e8ve")
-    student_name = st.text_input("Nom de l'\u00e9l\u00e8ve", help="Ex : DUPONT").upper()
-    student_firstname = st.text_input("Pr\u00e9nom de l'\u00e9l\u00e8ve", help="Ex : Jean").capitalize()
+    st.subheader("Informations de l'élève")
+    student_name = st.text_input("Nom de l'élève", help="Ex : DUPONT").upper()
+    student_firstname = st.text_input("Prénom de l'élève", help="Ex : Jean").capitalize()
     student_class = st.text_input("Classe", help="Ex : 6TTI").upper()
     student_option = st.text_input("Option", help="Ex : Informatique")
-    student_email_prefix = st.text_input("Pr\u00e9fixe Email (avant @eduhainaut.be)", help="Ex: jean.dupont")
+    student_email_prefix = st.text_input("Préfixe Email (avant @eduhainaut.be)", help="Ex: jean.dupont")
 
     full_email = f"{student_email_prefix}@eduhainaut.be" if student_email_prefix else ""
-    st.info(f"L'adresse email g\u00e9n\u00e9r\u00e9e sera : **{full_email}**")
+    st.info(f"L'adresse email générée sera : **{full_email}**")
 
-    submitted = st.form_submit_button("Passer \u00e0 la s\u00e9lection de position")
+    submitted = st.form_submit_button("Passer à la sélection de position")
 
 if submitted:
     if not (student_name and student_firstname and student_class and student_email_prefix):
-        st.error("Veuillez remplir toutes les informations requises (Nom, Pr\u00e9nom, Classe, Pr\u00e9fixe Email).")
+        st.error("Veuillez remplir toutes les informations requises (Nom, Prénom, Classe, Préfixe Email).")
     else:
         st.session_state["student_data"] = {
             "name": student_name,
@@ -158,7 +158,7 @@ if submitted:
 
 # --- Grille de positions ---
 if "student_data" in st.session_state:
-    st.subheader("Choisissez la position de l'\u00e9tiquette sur la feuille A4")
+    st.subheader("Choisissez la position de l'étiquette sur la feuille A4")
     if "selected_position" not in st.session_state:
         st.session_state.selected_position = None
 
@@ -171,7 +171,7 @@ if "student_data" in st.session_state:
 
     selected_position = st.session_state.selected_position
     if selected_position:
-        st.success(f"Position s\u00e9lectionn\u00e9e : {selected_position}")
+        st.success(f"Position sélectionnée : {selected_position}")
 
         data = st.session_state["student_data"]
         single_label_img = create_single_label_image(
@@ -180,22 +180,22 @@ if "student_data" in st.session_state:
         labels_to_place = {selected_position: single_label_img}
         final_a4_sheet = create_a4_sheet(labels_to_place)
 
-        st.image(final_a4_sheet, caption="Aper\u00e7u de la feuille d'\u00e9tiquettes", use_container_width=True)
+        st.image(final_a4_sheet, caption="Aperçu de la feuille d'étiquettes", use_container_width=True)
 
         buf = io.BytesIO()
         final_a4_sheet.save(buf, format="PNG")
         byte_im = buf.getvalue()
 
         st.download_button(
-            label="T\u00e9l\u00e9charger la feuille d'\u00e9tiquettes (PNG)",
+            label="Télécharger la feuille d'étiquettes (PNG)",
             data=byte_im,
             file_name="feuille_etiquettes_LPETH.png",
             mime="image/png"
         )
 
         grid_img = create_position_grid(selected_position)
-        st.markdown("### Grille des positions d'\u00e9tiquette (position s\u00e9lectionn\u00e9e en rouge)")
+        st.markdown("### Grille des positions d'étiquette (position sélectionnée en rouge)")
         st.image(grid_img, use_container_width=True)
 
 st.markdown("---")
-st.markdown("D\u00e9velopp\u00e9 avec \u2764\ufe0f pour le LPETH")
+st.markdown("Développé avec ❤️ pour le LPETH")
