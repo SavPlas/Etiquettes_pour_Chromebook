@@ -142,7 +142,7 @@ with st.form("label_form"):
         for col in range(3):  # 3 colonnes d'étiquettes
             position_number = row * 3 + col + 1
             with cols[col]:
-                if st.button(f"Emplacement {position_number}"):
+                if st.button(f"Emplacement {position_number}", key=f"pos_{position_number}"): #ajouter une key
                     label_x = col * LABEL_WIDTH_PX
                     label_y = row * LABEL_HEIGHT_PX
                     label_positions[position_number] = (label_x, label_y)
