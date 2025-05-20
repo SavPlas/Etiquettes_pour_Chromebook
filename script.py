@@ -8,30 +8,35 @@ import os
 A4_WIDTH_PX = 2480
 A4_HEIGHT_PX = 3508
 
-LABEL_WIDTH_PX = int((70 / 25.4) * 300)
-LABEL_HEIGHT_PX = int((37 / 25.4) * 300)
+LABEL_WIDTH_PX = int((70 / 25.4) * 300)  # 70mm à 300 DPI
+LABEL_HEIGHT_PX = int((37 / 25.4) * 300)  # 37mm à 300 DPI
 
 LABEL_PADDING_X = 20
 LABEL_PADDING_Y = 10
 
-QR_CODE_SIZE_PX = int((15 / 25.4) * 300)
+QR_CODE_SIZE_PX = int((15 / 25.4) * 300)  # 15mm à 300 DPI
 
 font_path = "Roboto-VariableFont_wdth,wght.ttf"
+
 if os.path.exists(font_path):
     try:
         font_name = ImageFont.truetype(font_path, 50)
         font_class_option = ImageFont.truetype(font_path, 40)
         font_email = ImageFont.truetype(font_path, 40)
     except Exception as e:
-        st.warning(f"Erreur chargement police : {e}. Police par défaut utilisée.")
+        st.warning(f"Erreur lors du chargement de la police : {e}. Utilisation de la police par défaut.")
         font_name = ImageFont.load_default()
         font_class_option = ImageFont.load_default()
         font_email = ImageFont.load_default()
 else:
-    st.warning("Police personnalisée non trouvée, police par défaut utilisée.")
+    st.warning(
+        "Police personnalisée 'Roboto-VariableFont_wdth,wght.ttf' non trouvée. Utilisation de la police par défaut. "
+        "Pour de meilleurs résultats, placez le fichier de police dans le même répertoire que le script."
+    )
     font_name = ImageFont.load_default()
     font_class_option = ImageFont.load_default()
     font_email = ImageFont.load_default()
+
 
 def generate_qr_code(data: str):
     qr = qrcode.QRCode(
@@ -45,42 +50,32 @@ def generate_qr_code(data: str):
     img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
     return img.resize((QR_CODE_SIZE_PX, QR_CODE_SIZE_PX))
 
-def create_single_label_image(name, firstname, student_class, option, email):
+
+def create_single_label_image(name: str, firstname: str, student_class: str, option: str, email: str):
     label_img = Image.new('RGB', (LABEL_WIDTH_PX, LABEL_HEIGHT_PX), color='white')
     draw = ImageDraw.Draw(label_img)
+
     current_y = LABEL_PADDING_Y + 10
 
-    # NOM
-    draw.text((LABEL_PADDING_X, current_y), name, fill=(0, 0, 0), font=font_name)
-    bbox = font_name.getbbox(name)
-    current_y += bbox[3] - bbox[1] + 5
+    draw.text((LABEL_PADDING_X, current_y), f"{name}", fill=(0, 0, 0), font=font_name)
+    current_y += font_name.getbbox(f"{name}")[3] - font_name.getbbox(f"{name}")[1] + 5
 
-    # Prénom
-    draw.text((LABEL_PADDING_X, current_y), firstname, fill=(0, 0, 0), font=font_name)
-    bbox = font_name.getbbox(firstname)
-    current_y += bbox[3] - bbox[1] + 10
+    draw.text((LABEL_PADDING_X, current_y), f"{firstname}", fill=(0, 0, 0), font=font_name)
+    current_y += font_name.getbbox(f"{firstname}")[3] - font_name.getbbox(f"{firstname}")[1] + 10
 
-    # Email
-    draw.text((LABEL_PADDING_X, current_y), email, fill=(0, 0, 0), font=font_email)
-    bbox = font_email.getbbox(email)
-    current_y += bbox[3] - bbox[1] + 15
+    draw.text((LABEL_PADDING_X, current_y), f"{email}", fill=(0, 0, 0), font=font_email)
+    current_y += font_email.getbbox(f"{email}")[3] - font_email.getbbox(f"{email}")[1] + 15
 
-    # Classe | Option | LPETH
-    text_line = f"{student_class}  |  {option}  |  LPETH"
-    # Tronquer si trop long
-    max_width = LABEL_WIDTH_PX - 2 * LABEL_PADDING_X
-    bbox = font_class_option.getbbox(text_line)
-    text_width = bbox[2] - bbox[0]
-    if text_width > max_width:
-        # approx nombre de caractères max
-        max_chars = int(len(text_line) * max_width / text_width) - 3
-        text_line = text_line[:max_chars] + "..."
-        bbox = font_class_option.getbbox(text_line)
+    classe_option_lpeth_text = f"{student_class}  |  {option}  |  LPETH"
+    classe_option_lpeth_width = font_class_option.getbbox(classe_option_lpeth_text)[2] - font_class_option.getbbox(classe_option_lpeth_text)[0]
 
-    draw.text((LABEL_PADDING_X, current_y), text_line, fill=(0, 0, 0), font=font_class_option)
-    current_y += bbox[3] - bbox[1] + 15
+    if classe_option_lpeth_width > LABEL_WIDTH_PX - 2 * LABEL_PADDING_X:
+        max_chars = int((LABEL_WIDTH_PX - 2 * LABEL_PADDING_X) / (classe_option_lpeth_width / len(classe_option_lpeth_text)))
+        classe_option_lpeth_text = classe_option_lpeth_text[:max_chars] + "..."
 
-    # QR code centré en bas
+    draw.text((LABEL_PADDING_X, current_y), classe_option_lpeth_text, fill=(0, 0, 0), font=font_class_option)
+    current_y += font_class_option.getbbox(classe_option_lpeth_text)[3] - font_class_option.getbbox(classe_option_lpeth_text)[1] + 15
+
     qr_img = generate_qr_code(email)
     qr_x = (LABEL_WIDTH_PX - QR_CODE_SIZE_PX) // 2
     qr_y = LABEL_HEIGHT_PX - QR_CODE_SIZE_PX - LABEL_PADDING_Y
@@ -88,7 +83,8 @@ def create_single_label_image(name, firstname, student_class, option, email):
 
     return label_img
 
-def create_a4_sheet(labels_data):
+
+def create_a4_sheet(labels_data: dict):
     a4_sheet = Image.new('RGB', (A4_WIDTH_PX, A4_HEIGHT_PX), color='white')
 
     for position, label_img in labels_data.items():
@@ -102,43 +98,42 @@ def create_a4_sheet(labels_data):
 
     return a4_sheet
 
-def create_position_grid(selected_pos):
-    # Crée une image A4 blanche avec une grille 3x8 pour visualiser les positions
-    grid_img = Image.new("RGB", (A4_WIDTH_PX, A4_HEIGHT_PX), "white")
+
+def create_position_grid(selected_position):
+    grid_img = Image.new('RGB', (A4_WIDTH_PX, A4_HEIGHT_PX), color='white')
     draw = ImageDraw.Draw(grid_img)
+
+    font = font_name  # Utiliser la même police
 
     for pos in range(1, 25):
         col = (pos - 1) % 3
         row = (pos - 1) // 3
+
         x = col * LABEL_WIDTH_PX
         y = row * LABEL_HEIGHT_PX
-        box_color = (255, 255, 255)
-        outline_color = (0, 0, 0)
 
-        if pos == selected_pos:
-            outline_color = (255, 0, 0)  # rouge pour la sélection
-            box_color = (255, 230, 230)
+        # Rectangle de la position
+        rect_color = (255, 0, 0) if pos == selected_position else (200, 200, 200)
+        draw.rectangle([x, y, x + LABEL_WIDTH_PX, y + LABEL_HEIGHT_PX], outline=rect_color, width=5)
 
-        # rectangle étiquette
-        draw.rectangle([x, y, x + LABEL_WIDTH_PX, y + LABEL_HEIGHT_PX], fill=box_color, outline=outline_color, width=5)
-        # numéro de position centré
+        # Numéro de position au centre
         text = str(pos)
-        bbox = font_name.getbbox(text)
-        w = bbox[2] - bbox[0]
-        h = bbox[3] - bbox[1]
+        w, h = draw.textsize(text, font=font)
         text_x = x + (LABEL_WIDTH_PX - w) // 2
         text_y = y + (LABEL_HEIGHT_PX - h) // 2
-        draw.text((text_x, text_y), text, fill=(0, 0, 0), font=font_name)
+        draw.text((text_x, text_y), text, fill=rect_color, font=font)
 
     return grid_img
 
+
 # --- Application Streamlit ---
 st.set_page_config(page_title="Générateur d'Étiquettes LPETH", layout="centered")
+
 st.title("🏷️ Générateur d'Étiquettes LPETH")
 
 st.markdown("""
 Bienvenue dans le générateur d'étiquettes pour les élèves du LPETH !
-Remplissez les informations ci-dessous et choisissez la position de l'étiquette sur la feuille A4.
+Remplissez les informations de l'élève ci-dessous et choisissez la position de l'étiquette sur la feuille A4.
 """)
 
 with st.form("label_form"):
@@ -164,7 +159,6 @@ if submitted:
     else:
         st.success("Étiquette générée avec succès ! 👇")
 
-        # Image étiquette
         single_label_img = create_single_label_image(
             student_name,
             student_firstname,
@@ -173,13 +167,11 @@ if submitted:
             full_email
         )
 
-        # Placement unique
         labels_to_place = {selected_position: single_label_img}
 
-        # Création feuille A4
         final_a4_sheet = create_a4_sheet(labels_to_place)
 
-        st.image(final_a4_sheet, caption="Aperçu de la feuille d'étiquettes", use_container_width=True)
+        _ = st.image(final_a4_sheet, caption="Aperçu de la feuille d'étiquettes", use_container_width=True)
 
         buf = io.BytesIO()
         final_a4_sheet.save(buf, format="PNG")
@@ -192,12 +184,11 @@ if submitted:
             mime="image/png"
         )
 
-        st.info("Téléchargez puis imprimez sur feuille A4 pour étiquettes.")
+        _ = st.info("Téléchargez puis imprimez sur feuille A4 pour étiquettes.")
 
-        # Affichage grille des positions avec la sélection visible
         grid_img = create_position_grid(selected_position)
         st.markdown("### Grille des positions d'étiquette (position sélectionnée en rouge)")
-        st.image(grid_img, use_container_width=True)
+        _ = st.image(grid_img, use_container_width=True)
 
 st.markdown("---")
 st.markdown("Développé avec ❤️ pour le LPETH")
