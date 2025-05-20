@@ -10,27 +10,27 @@ A4_WIDTH_PX = 2480
 A4_HEIGHT_PX = 3508
 
 # Dimensions des étiquettes (70mm x 37mm converties en pixels à 300 DPI)
-LABEL_WIDTH_PX = int((70 / 25.4) * 300)  # 70mm à 300 DPI
-LABEL_HEIGHT_PX = int((37 / 25.4) * 300)  # 37mm à 300 DPI
+LABEL_WIDTH_PX = int((70 / 25.4) * 300)
+LABEL_HEIGHT_PX = int((37 / 25.4) * 300)
 
 # Marges/remplissage à l'intérieur d'une étiquette
-LABEL_PADDING_X = 20  # Réduit le rembourrage pour mieux adapter le contenu
-LABEL_PADDING_Y = 10  # Réduit le rembourrage pour mieux adapter le contenu
+LABEL_PADDING_X = 20
+LABEL_PADDING_Y = 10
 
 # Taille du QR Code (15mm x 15mm converties en pixels à 300 DPI)
-QR_CODE_SIZE_PX = int((15 / 25.4) * 300)  # 15mm à 300 DPI
+QR_CODE_SIZE_PX = int((15 / 25.4) * 300)
 
 # Chemins des polices
 font_name = None
 font_class_option = None
 font_email = None
-font_path = "Roboto-VariableFont_wdth,wght.ttf"  # Chemin relatif vers la police
+font_path = "Roboto-VariableFont_wdth,wght.ttf"
 
 if os.path.exists(font_path):
     try:
-        font_name = ImageFont.truetype(font_path, 50)  # Augmente la taille de la police
-        font_class_option = ImageFont.truetype(font_path, 40)  # Augmente la taille de la police
-        font_email = ImageFont.truetype(font_path, 40)  # Augmente la taille de la police
+        font_name = ImageFont.truetype(font_path, 50)
+        font_class_option = ImageFont.truetype(font_path, 40)
+        font_email = ImageFont.truetype(font_path, 40)
     except Exception as e:
         st.warning(f"Erreur lors du chargement de la police : {e}. Utilisation de la police par défaut.")
         font_name = ImageFont.load_default()
@@ -45,19 +45,18 @@ else:
 
 
 # --- Fonctions ---
-
 def generate_qr_code(data: str):
     """Génère une image de code QR à partir des données données."""
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=1,  # Réduit la taille de la boîte pour un QR code plus petit
+        box_size=1,
         border=4,
     )
     qr.add_data(data)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
-    return img.resize((QR_CODE_SIZE_PX, QR_CODE_SIZE_PX))  # Redimensionne le QR code à la taille désirée
+    return img.resize((QR_CODE_SIZE_PX, QR_CODE_SIZE_PX))
 
 
 def create_single_label_image(name: str, firstname: str, student_class: str, option: str, email: str):
@@ -68,11 +67,11 @@ def create_single_label_image(name: str, firstname: str, student_class: str, opt
     draw = ImageDraw.Draw(label_img)
 
     # Calculer les positions du texte
-    current_y = LABEL_PADDING_Y + 10  # Déplace le texte vers le bas en augmentant la valeur initiale de current_y
+    current_y = LABEL_PADDING_Y + 10
 
     # NOM PRENOM
     draw.text((LABEL_PADDING_X, current_y), f"{name}", fill=(0, 0, 0), font=font_name)
-    current_y += font_name.getbbox(f"{name}")[3] - font_name.getbbox(f"{name}")[1] + 5  # Réduit l'espacement
+    current_y += font_name.getbbox(f"{name}")[3] - font_name.getbbox(f"{name}")[1] + 5
 
     # Prénom
     draw.text((LABEL_PADDING_X, current_y), f"{firstname}", fill=(0, 0, 0), font=font_name)
@@ -86,7 +85,6 @@ def create_single_label_image(name: str, firstname: str, student_class: str, opt
     classe_option_lpeth_text = f"{student_class}  |  {option}  |  LPETH"
     classe_option_lpeth_width = font_class_option.getbbox(classe_option_lpeth_text)[2] - font_class_option.getbbox(
         classe_option_lpeth_text)[0]
-    # Si le texte est trop long, le tronquer
     if classe_option_lpeth_width > LABEL_WIDTH_PX - 2 * LABEL_PADDING_X:
         classe_option_lpeth_text = classe_option_lpeth_text[:int(
             (LABEL_WIDTH_PX - 2 * LABEL_PADDING_X) / (classe_option_lpeth_width / len(classe_option_lpeth_text)))] + "..."
@@ -95,13 +93,12 @@ def create_single_label_image(name: str, firstname: str, student_class: str, opt
 
     draw.text((LABEL_PADDING_X, current_y), classe_option_lpeth_text, fill=(0, 0, 0), font=font_class_option)
     current_y += font_class_option.getbbox(classe_option_lpeth_text)[3] - font_class_option.getbbox(
-        classe_option_lpeth_text)[1] + 15  # Augmente l'espacement
+        classe_option_lpeth_text)[1] + 15
 
     # QR Code
     qr_img = generate_qr_code(email)
-    # Centrer le QR code et le placer plus bas
     qr_x = (LABEL_WIDTH_PX - QR_CODE_SIZE_PX) // 2
-    qr_y = LABEL_HEIGHT_PX - QR_CODE_SIZE_PX - LABEL_PADDING_Y  # Place le QR code en bas
+    qr_y = LABEL_HEIGHT_PX - QR_CODE_SIZE_PX - LABEL_PADDING_Y
     label_img.paste(qr_img, (qr_x, qr_y))
 
     return label_img
@@ -110,31 +107,21 @@ def create_single_label_image(name: str, firstname: str, student_class: str, opt
 def create_a4_sheet(labels_data: dict):
     """
     Crée une feuille A4 complète avec des étiquettes aux positions spécifiées.
-    labels_data est un dictionnaire où les clés sont les positions des étiquettes (1-24) et les valeurs sont les images d'étiquettes générées.
+    labels_data est un dictionnaire où les clés sont les positions des étiquettes et les valeurs sont les images d'étiquettes générées.
     """
     a4_sheet = Image.new('RGB', (A4_WIDTH_PX, A4_HEIGHT_PX), color='white')
-
-    for position, label_img in labels_data.items():
-        # Calculer la ligne et la colonne à partir de la position (1-24)
-        col = (position - 1) % 3
-        row = (position - 1) // 3
-
-        x_offset = col * LABEL_WIDTH_PX
-        y_offset = row * LABEL_HEIGHT_PX
-
-        a4_sheet.paste(label_img, (x_offset, y_offset))
-
+    for (x, y), label_img in labels_data.items():
+        a4_sheet.paste(label_img, (x, y))
     return a4_sheet
 
 
 # --- Application Streamlit ---
 st.set_page_config(page_title="Générateur d'Étiquettes LPETH", layout="centered")
-
 st.title("🏷️ Générateur d'Étiquettes LPETH")
 
 st.markdown("""
 Bienvenue dans le générateur d'étiquettes pour les élèves du LPETH !
-Remplissez les informations de l'élève ci-dessous et choisissez la position de l'étiquette sur la feuille A4.
+Remplissez les informations de l'élève ci-dessous et choisissez l'emplacement de l'étiquette sur la feuille A4.
 """)
 
 with st.form("label_form"):
@@ -144,13 +131,22 @@ with st.form("label_form"):
     student_class = st.text_input("Classe", help="Ex : 6TTI").upper()
     student_option = st.text_input("Option", help="Ex : Informatique")
     student_email_prefix = st.text_input("Préfixe Email (avant @eduhainaut.be)", help="Ex: jean.dupont")
-
     full_email = f"{student_email_prefix}@eduhainaut.be" if student_email_prefix else ""
     st.info(f"L'adresse email générée sera : **{full_email}**")
 
-    st.subheader("Position de l'étiquette sur la feuille A4")
-    label_positions = list(range(1, 25))
-    selected_position = st.selectbox("Choisir la position de l'étiquette", label_positions)
+    st.subheader("Emplacement de l'étiquette sur la feuille A4")
+    # Créer une zone de sélection d'emplacement plus visuelle
+    cols = st.columns(3)  # Diviser la largeur en 3 colonnes pour l'affichage de la grille
+    label_positions = {}
+    for row in range(8):  # 8 lignes d'étiquettes
+        for col in range(3):  # 3 colonnes d'étiquettes
+            position_number = row * 3 + col + 1
+            with cols[col]:
+                if st.button(f"Emplacement {position_number}"):
+                    label_x = col * LABEL_WIDTH_PX
+                    label_y = row * LABEL_HEIGHT_PX
+                    label_positions[position_number] = (label_x, label_y)
+                    st.session_state['selected_position'] = (label_x, label_y) #sauvegarde de la position choisie
 
     submitted = st.form_submit_button("Générer l'étiquette")
 
@@ -169,8 +165,11 @@ if submitted:
             full_email
         )
 
-        # Préparer les données pour la feuille A4. Nous n'avons qu'une seule étiquette à placer pour l'instant.
-        labels_to_place = {selected_position: single_label_img}
+        # Préparer les données pour la feuille A4.
+        if 'selected_position' in st.session_state:
+            labels_to_place = {st.session_state['selected_position']: single_label_img}
+        else:
+             labels_to_place = {(0,0): single_label_img} #Valeur par défaut
 
         # Créer la feuille A4 complète
         final_a4_sheet = create_a4_sheet(labels_to_place)
