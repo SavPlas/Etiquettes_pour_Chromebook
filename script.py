@@ -83,7 +83,7 @@ def create_single_label_image(name, firstname, student_class, option, email):
     # QR code centré en bas
     qr_img = generate_qr_code(email)
     qr_x = (LABEL_WIDTH_PX - QR_CODE_SIZE_PX) // 2
-    qr_y = LABEL_HEIGHT_PX - QR_CODE_SIZE_PX - LABEL_PADDING_Y
+    qr_y = LABEL_HEIGHT_PX - QR_CODE_SIZE_PX - LABEL_PADDING_Y - 20
     label_img.paste(qr_img, (qr_x, qr_y))
 
     return label_img
