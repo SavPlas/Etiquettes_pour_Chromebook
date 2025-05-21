@@ -18,7 +18,7 @@ QR_CODE_SIZE_PX = int((15 / 25.4) * 300)
 
 # Marges et espacement entre étiquettes
 MARGIN_LEFT = int((5 / 25.4) * 300)   # 5 mm marge à gauche
-MARGIN_TOP = int((5 / 25.4) * 300)    # 5 mm marge en haut
+MARGIN_TOP = int((5 / 25.4) * 300) - int((7.5 / 25.4) * 300)  # 5 mm de base - 7,5 mm de remontée
 
 SPACING_X = 10  # espace horizontal entre étiquettes (en px)
 SPACING_Y = 5   # espace vertical entre étiquettes (en px)
